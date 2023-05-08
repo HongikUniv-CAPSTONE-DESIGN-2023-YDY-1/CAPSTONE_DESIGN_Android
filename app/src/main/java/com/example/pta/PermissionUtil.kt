@@ -7,12 +7,13 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.pta.ui.camera.CameraFragment
 
 object PermissionUtil {
 
     private var permissionLauncher: ActivityResultLauncher<Array<String>>? = null
 
-    fun checkPermission(context: Context, permissionList: List<String>): Boolean {
+    fun checkPermission(context: CameraFragment, permissionList: List<String>): Boolean {
         for (permission in permissionList) {
             if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_DENIED) {
                 return false

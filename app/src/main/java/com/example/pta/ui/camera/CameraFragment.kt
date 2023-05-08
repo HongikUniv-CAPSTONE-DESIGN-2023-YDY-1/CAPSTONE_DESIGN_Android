@@ -13,9 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.pta.PermissionUtil
 import com.example.pta.databinding.FragmentCameraBinding
-import com.google.common.util.concurrent.ListenableFuture
 import java.io.File
-import java.security.Permission
 import java.util.concurrent.ExecutorService
 
 
@@ -52,7 +50,7 @@ class CameraFragment : Fragment() {
     private fun permissionCheck() {
         var permissionList =
             listOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
-        if (!PermissionUtil.checkPermission(requireContext(), permissionList)) {
+        if (!PermissionUtil.checkPermission(this, permissionList)) {
             PermissionUtil.requestPermission(this, permissionList)
 
 
