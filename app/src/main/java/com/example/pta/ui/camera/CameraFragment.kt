@@ -55,7 +55,7 @@ class CameraFragment : Fragment() {
         if (!PermissionUtil.checkPermission(requireContext(), permissionList)) {
             PermissionUtil.requestPermission(this, permissionList)
 
-            )
+
         } else {
            openCamera()
         }
