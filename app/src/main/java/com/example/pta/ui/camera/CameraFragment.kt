@@ -1,69 +1,69 @@
 package com.example.pta.ui.camera
 
 
-import android.Manifest
-import android.net.Uri
+
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import androidx.camera.core.ImageCapture
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.example.pta.PermissionUtil
 import com.example.pta.databinding.FragmentCameraBinding
-import java.io.File
-import java.util.concurrent.ExecutorService
+import java.util.jar.Manifest
 
 
 class CameraFragment : Fragment() {
 
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
-    private var imageCapture: ImageCapture? = null
 
-    private lateinit var outputDirectory: File
-    private lateinit var cameraExecutor: ExecutorService
 
-    private lateinit var cameraAnimationListener: Animation.AnimationListener
-
-    private var savedUri: Uri? = null
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+    override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        val cameraViewModel =
-            ViewModelProvider(this).get(CameraViewModel::class.java)
-        _binding = FragmentCameraBinding.inflate(inflater, container, false)
+        requestPermissions()
         val root: View = binding.root
-
-
-
-
-
-
         return root
     }
-    private fun permissionCheck() {
-        var permissionList =
-            listOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
-        if (!PermissionUtil.checkPermission(this, permissionList)) {
-            PermissionUtil.requestPermission(this, permissionList)
-
-
-        } else {
-           openCamera()
-        }
-
-
-
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    private fun requestPermissions() {
+        requestCameraPermissionIfMissing { granted ->
+            if (granted)
+                startCamera()
+            else
+                Toast.makeText( this, "카메라 권한 거절됨", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun startCamera() {
+
+    }
+
+    private  fun requestCameraPermissionIfMissing(onResult: ((Boolean) -> Unit)) {
+        if (ContextCompat.checkSelfPermission(, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
+            onResult(true)
+        else
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                onResult(it)
+            }.launch(Manifest.permission.CAMERA)
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
