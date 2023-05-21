@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -41,6 +42,7 @@ class CameraFragment : Fragment() {
     private var _binding: FragmentCameraBinding? = null
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraSelector: CameraSelector
+
     private val binding get() = _binding!!
     private val cameraProviderResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
@@ -107,15 +109,18 @@ class CameraFragment : Fragment() {
     private fun takePhoto(){
         imageCapture?.let{
             val fileName = "JPEG_${System.currentTimeMillis()}"
-            val file = File(context?.filesDir, fileName)
+            val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), fileName)
             val outputFileOptions = ImageCapture.OutputFileOptions.Builder(file).build()
-
             it.takePicture(
                 outputFileOptions,
                 imgCaptureExecutor,
                 object : ImageCapture.OnImageSavedCallback {
                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults){
-                        Log.i(TAG,"The image has been saved in ${file.toUri()}")
+                        val savedUri = outputFileResults.savedUri ?: Uri.fromFile(file)
+                        Log.i(TAG,"The image has been saved in ${savedUri}")
+                        val intent = Intent(activity, CameraSearchActivity::class.java)
+                        intent.putExtra("imageUri", savedUri.toString())
+                        startActivity(intent)
                     }
 
                     override fun onError(exception: ImageCaptureException) {
@@ -130,6 +135,7 @@ class CameraFragment : Fragment() {
                 })
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.M)
     private fun animateFlash() {
         binding.root.postDelayed({
